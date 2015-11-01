@@ -1,5 +1,5 @@
-import App from './classes/App';
+import World from './classes/World';
 
-(() => {
-  new App();
-})();
+window.onload = () => {
+  new World();
+};
