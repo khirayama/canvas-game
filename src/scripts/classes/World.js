@@ -1,4 +1,6 @@
 import Player from './Player';
+import Enemy from './Enemy';
+import Engine from './Engine';
 
 export default class World {
   constructor() {
@@ -19,6 +21,9 @@ export default class World {
 
     // alias
     this.stage = this.canvas;
+    this.stage.count = 0;
+    this.stage.fps = 10;
+
     this.stage.add = (obj) => {
       this.objs.push(obj);
     };
@@ -33,16 +38,22 @@ export default class World {
 
   setup() {
     this.objs = [];
+    const engine = new Engine(this.objs);
     // this.objs.push(new Camera(this.canvas, this.context));
     // this.objs.push(new Map(this.canvas, this.context));
     this.objs.push(new Player(this.stage));
+    setInterval(() => {
+      this.objs.push(new Enemy(this.stage));
+    }, 3000);
 
     // TODO: Should use requestAnimationFrame.
     setInterval(() => {
+      this.stage.count += 1;
+      engine.collisionJudges();
       this.update();
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.draw();
-    }, 1000 / 60);
+    }, 1000 / this.stage.fps);
   }
 
   update() {
