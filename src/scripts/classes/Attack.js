@@ -31,4 +31,17 @@ export default class Attack {
   remove() {
     this.stage.remove(this);
   }
+
+  collision(target) {
+    const className = target.constructor.name;
+
+    switch (className) {
+    case 'Enemy':
+      this.remove();
+      break;
+    }
+  }
+
+  uncollision() {
+  }
 }

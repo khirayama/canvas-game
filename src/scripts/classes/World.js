@@ -5,67 +5,80 @@ import Engine from './Engine';
 export default class World {
   constructor() {
     console.log(`Start world at ${new Date()}.`);
+
     this.canvas = null;
     this.context = null;
     this.objs = [];
+    this.fps = 60;
+    this.count = 0;
 
     this.setCanvas();
-    this.setup();
+    this.start();
   }
 
   setCanvas() {
     this.canvas = document.getElementById('app');
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight - 4;
+    this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d');
 
     // alias
-    this.stage = this.canvas;
-    this.stage.count = 0;
-    this.stage.fps = 10;
-
-    this.stage.add = (obj) => {
-      this.objs.push(obj);
-    };
-    this.stage.remove = (obj) => {
-      for (let i = 0; i < this.objs.length; i++) {
-        if (obj === this.objs[i]) {
-          this.objs.splice(i, 1);
-        }
-      }
+    this.stage = {
+      screen: this.canvas,
+      width: this.canvas.width,
+      height: this.canvas.height,
+      context: this.context,
+      objs: this.objs,
+      fps: this.fps,
+      count: this.count,
+      add: this.add,
+      remove: this.remove,
     };
   }
 
-  setup() {
-    this.objs = [];
-    const engine = new Engine(this.objs);
-    // this.objs.push(new Camera(this.canvas, this.context));
-    // this.objs.push(new Map(this.canvas, this.context));
-    this.objs.push(new Player(this.stage));
-    setInterval(() => {
-      this.objs.push(new Enemy(this.stage));
-    }, 3000);
-
+  start() {
+    this.setup();
     // TODO: Should use requestAnimationFrame.
     setInterval(() => {
-      this.stage.count += 1;
-      engine.collisionJudges();
+      this.engine.collisionJudges(this.objs);
       this.update();
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.stage.context.clearRect(0, 0, this.stage.screen.width, this.stage.screen.height);
       this.draw();
     }, 1000 / this.stage.fps);
   }
 
+  setup() {
+    this.engine = new Engine(this);
+    this.add(new Player(this.stage));
+    // this.objs.push(new Camera(this.canvas, this.context));
+    // this.objs.push(new Map(this.canvas, this.context));
+  }
+
   update() {
-    for (let i = 0; i < this.objs.length; i++) {
-      this.objs[i].update();
+    this.stage.count += 1;
+    for (let index = 0; index < this.stage.objs.length; index++) {
+      this.stage.objs[index].update();
+    }
+    if (this.stage.count % (this.stage.fps) === 0) {
+      this.add(new Enemy(this.stage));
     }
   }
 
   draw() {
-    for (let i = 0; i < this.objs.length; i++) {
-      this.objs[i].draw(this.context);
+    for (let index = 0; index < this.stage.objs.length; index++) {
+      this.stage.objs[index].draw(this.context);
+    }
+  }
+
+  add(obj) {
+    this.objs.push(obj);
+  }
+
+  remove(obj) {
+    for (let index = 0; index < this.objs.length; index++) {
+      if (obj === this.objs[index]) {
+        this.objs.splice(index, 1);
+      }
     }
   }
 }
-

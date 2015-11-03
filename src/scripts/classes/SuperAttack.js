@@ -12,4 +12,7 @@ export default class SuperAttack extends Attack {
       color: 'black',
     };
   }
+
+  collision() {
+  }
 }

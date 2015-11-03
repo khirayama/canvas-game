@@ -209,4 +209,10 @@ export default class Player {
   on(eventName, handler) {
     window.addEventListener(eventName, handler);
   }
+
+  collision() {
+  }
+
+  uncollision() {
+  }
 }
